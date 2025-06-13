@@ -43,14 +43,8 @@ public class Account {
 
     String email;
 
-    String password;
-
     @Enumerated(EnumType.STRING)
     Role role;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "`register_type`")
-    RegisterType registerType;
 
     @Column(name = "`register_date`")
     LocalDate registerDate;
