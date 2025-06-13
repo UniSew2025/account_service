@@ -1,6 +1,5 @@
 package com.unisew.account_service.models;
 
-import com.unisew.account_service.enums.RegisterType;
 import com.unisew.account_service.enums.Role;
 import com.unisew.account_service.enums.Status;
 import jakarta.persistence.CascadeType;
