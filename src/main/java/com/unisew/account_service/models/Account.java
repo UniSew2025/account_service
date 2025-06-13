@@ -45,10 +45,6 @@ public class Account {
 
     String password;
 
-    String name;
-
-    String avatar;
-
     @Enumerated(EnumType.STRING)
     Role role;
 
@@ -66,11 +62,15 @@ public class Account {
     @PrimaryKeyJoinColumn
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    Customer customer;
+    Wallet wallet;
 
-    @OneToOne(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @OneToMany(mappedBy = "sender")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    Wallet wallet;
+    List<Transaction> senderTransactions;
+
+    @OneToMany(mappedBy = "receiver")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    List<Transaction> receiverTransactions;
 }
