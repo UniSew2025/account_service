@@ -30,7 +30,7 @@ public class AccountServiceApplication {
                 if(accountRepo.count() == 0){
                     accountRepo.save(
                             Account.builder()
-                                    .email("unisewsu2025@gmail.com")
+                                    .email("khavhuynhw@gmail.com")
                                     .role(Role.ADMIN)
                                     .registerDate(LocalDate.now())
                                     .status(Status.ACCOUNT_ACTIVE)
