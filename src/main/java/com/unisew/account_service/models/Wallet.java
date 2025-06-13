@@ -32,6 +32,8 @@ public class Wallet {
     @Column(name = "`account_id`")
     Integer id;
 
+    long balance;
+
     @Column(name = "`pending_balance`")
     long pendingBalance;
 
