@@ -36,6 +36,15 @@ public class AccountServiceApplication {
                                     .status(Status.ACCOUNT_ACTIVE)
                                     .build()
                     );
+
+                    accountRepo.save(
+                            Account.builder()
+                                    .email("unisewsu2025@gmail.com")
+                                    .role(Role.ADMIN)
+                                    .registerDate(LocalDate.now())
+                                    .status(Status.ACCOUNT_ACTIVE)
+                                    .build()
+                    );
                 }
             }
         };
