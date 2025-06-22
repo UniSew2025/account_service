@@ -12,8 +12,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LoginRequest {
-    String email;
+public class CreateProfileRequest {
+    int accountId;
     String avatar;
     String name;
+    String role;
 }

@@ -1,10 +1,14 @@
 package com.unisew.account_service.services.implementors;
 
+import com.unisew.account_service.enums.Role;
+import com.unisew.account_service.enums.Status;
 import com.unisew.account_service.models.Account;
 import com.unisew.account_service.repositories.AccountRepo;
+import com.unisew.account_service.requests.CreateProfileRequest;
 import com.unisew.account_service.requests.LoginRequest;
 import com.unisew.account_service.responses.ResponseObject;
 import com.unisew.account_service.services.AuthService;
+import com.unisew.account_service.services.ProfileService;
 import com.unisew.account_service.utils.ResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +25,8 @@ import java.util.Map;
 public class AuthImpl implements AuthService {
 
     private final AccountRepo accountRepo;
+
+    private final ProfileService profileService;
 
     @Value("${google.client_id}")
     private String clientId;
@@ -49,15 +56,44 @@ public class AuthImpl implements AuthService {
     public ResponseEntity<ResponseObject> login(LoginRequest request) {
         Account account = accountRepo.findByEmail(request.getEmail()).orElse(null);
         if (account == null) {
-            return ResponseBuilder.build(HttpStatus.BAD_REQUEST, "Invalid email", null);
+            return createAccount(request);
         }
-        Map<String, Object> data = new HashMap<>();
-        data.put("id", account.getId());
-        data.put("email", account.getEmail());
-        data.put("role", account.getRole().getValue().toLowerCase());
-        data.put("status", account.getStatus().getValue().toLowerCase());
-        data.put("registerDate", account.getRegisterDate());
+        Map<String, Object> data = buildAccountResponse(account);
+        data.put("profile", profileService.getProfile(account.getId()).getBody().getData());
 
         return ResponseBuilder.build(HttpStatus.OK, "Login successfully", data);
+    }
+
+    private ResponseEntity<ResponseObject> createAccount(LoginRequest request) {
+        Account account = accountRepo.save(
+                Account.builder()
+                        .registerDate(LocalDate.now())
+                        .email(request.getEmail())
+                        .role(Role.SCHOOL)
+                        .status(Status.ACCOUNT_ACTIVE)
+                        .build()
+        );
+
+        CreateProfileRequest createProfileRequest = CreateProfileRequest.builder()
+                .accountId(account.getId())
+                .avatar(request.getAvatar())
+                .name(request.getName())
+                .role(account.getRole().getValue().toLowerCase())
+                .build();
+
+        Map<String, Object> data = buildAccountResponse(account);
+        data.put("profile", profileService.createProfile(createProfileRequest).getBody().getData());
+
+        return ResponseBuilder.build(HttpStatus.OK, "Login successfully", data);
+    }
+
+    private Map<String, Object> buildAccountResponse(Account account) {
+        Map<String, Object> accountData = new HashMap<>();
+        accountData.put("id", account.getId());
+        accountData.put("email", account.getEmail());
+        accountData.put("role", account.getRole().getValue().toLowerCase());
+        accountData.put("status", account.getStatus().getValue().toLowerCase());
+        accountData.put("registerDate", account.getRegisterDate());
+        return accountData;
     }
 }

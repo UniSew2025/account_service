@@ -8,12 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
 
 @SpringBootApplication
 @RequiredArgsConstructor
+@EnableFeignClients
 public class AccountServiceApplication {
 
     private final AccountRepo accountRepo;
@@ -41,6 +43,24 @@ public class AccountServiceApplication {
                             Account.builder()
                                     .email("unisewsu2025@gmail.com")
                                     .role(Role.ADMIN)
+                                    .registerDate(LocalDate.now())
+                                    .status(Status.ACCOUNT_ACTIVE)
+                                    .build()
+                    );
+
+                    accountRepo.save(
+                            Account.builder()
+                                    .email("kenkami296@gmail.com")
+                                    .role(Role.DESIGNER)
+                                    .registerDate(LocalDate.now())
+                                    .status(Status.ACCOUNT_ACTIVE)
+                                    .build()
+                    );
+
+                    accountRepo.save(
+                            Account.builder()
+                                    .email("quocvdkse160940@fpt.edu.vn")
+                                    .role(Role.GARMENT_FACTORY)
                                     .registerDate(LocalDate.now())
                                     .status(Status.ACCOUNT_ACTIVE)
                                     .build()
