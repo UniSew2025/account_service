@@ -22,5 +22,7 @@ public class AccountRequestDTO {
     @Email
     private String email;
     private Role role;
+    private String name;
     private RegisterType registerType;
+    private String status;
 }

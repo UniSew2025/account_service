@@ -54,7 +54,7 @@ public class AccountImpl implements AccountService {
             if (updatedAccountDetails.getEmail() != null && !updatedAccountDetails.getEmail().isEmpty()) {
                 existingAccount.setEmail(updatedAccountDetails.getEmail());
             }
-
+            existingAccount.setRole(updatedAccountDetails.getRole());
             return accountRepo.save(existingAccount);
         } catch (RuntimeException e) {
             log.error("Error updating account {}: {}", id, e.getMessage());

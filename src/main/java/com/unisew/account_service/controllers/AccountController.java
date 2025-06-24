@@ -76,6 +76,7 @@ public class AccountController {
             Account updatedAccountDetails = Account.builder()
                     .email(request.getEmail())
                     .role(request.getRole())
+                    .status(Status.valueOf(request.getStatus()))
                     .build();
             
             Account updatedAccount = accountService.updateAccount(id, updatedAccountDetails);
@@ -188,7 +189,6 @@ public class AccountController {
         return AccountResponseDTO.builder()
                 .id(account.getId())
                 .email(account.getEmail())
-                .name(account.getEmail()) // Using email as name since name field is not in Account model
                 .role(account.getRole())
                 .registerDate(account.getRegisterDate())
                 .status(account.getStatus())
