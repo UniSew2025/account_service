@@ -17,8 +17,15 @@ import org.springframework.context.annotation.Configuration;
         ),
         servers = {
                 @Server(url = "http://localhost:8080", description = "Gateway Server")
-        }
+        },
+        security = @SecurityRequirement(name = "bearerAuth")
 )
-
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        in = SecuritySchemeIn.HEADER
+)
 public class SwaggerConfig {
 }

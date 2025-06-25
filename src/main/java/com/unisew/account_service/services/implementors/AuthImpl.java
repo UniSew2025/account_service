@@ -8,6 +8,7 @@ import com.unisew.account_service.requests.CreateProfileRequest;
 import com.unisew.account_service.requests.LoginRequest;
 import com.unisew.account_service.responses.ResponseObject;
 import com.unisew.account_service.services.AuthService;
+import com.unisew.account_service.services.JWTService;
 import com.unisew.account_service.services.ProfileService;
 import com.unisew.account_service.utils.ResponseBuilder;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ public class AuthImpl implements AuthService {
     private final AccountRepo accountRepo;
 
     private final ProfileService profileService;
+
+    private final JWTService jwtService;
 
     @Value("${google.client_id}")
     private String clientId;
@@ -59,7 +62,7 @@ public class AuthImpl implements AuthService {
             return createAccount(request);
         }
         Map<String, Object> data = buildAccountResponse(account);
-        data.put("profile", profileService.getProfile(account.getId()).getBody().getData());
+        data.put("profile", profileService.getProfile(account.getId()));
 
         return ResponseBuilder.build(HttpStatus.OK, "Login successfully", data);
     }
@@ -82,7 +85,7 @@ public class AuthImpl implements AuthService {
                 .build();
 
         Map<String, Object> data = buildAccountResponse(account);
-        data.put("profile", profileService.createProfile(createProfileRequest).getBody().getData());
+        data.put("profile", profileService.createProfile(createProfileRequest));
 
         return ResponseBuilder.build(HttpStatus.OK, "Login successfully", data);
     }
@@ -94,6 +97,7 @@ public class AuthImpl implements AuthService {
         accountData.put("role", account.getRole().getValue().toLowerCase());
         accountData.put("status", account.getStatus().getValue().toLowerCase());
         accountData.put("registerDate", account.getRegisterDate());
+        accountData.put("token", jwtService.generateToken(account.getEmail(), account.getRole().getValue(), account.getId()));
         return accountData;
     }
 }
