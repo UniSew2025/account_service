@@ -1,5 +1,6 @@
 package com.unisew.account_service.controllers;
 
+import com.unisew.account_service.enums.Role;
 import com.unisew.account_service.enums.Status;
 import com.unisew.account_service.models.Account;
 import com.unisew.account_service.requests.AccountRequestDTO;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -76,9 +78,8 @@ public class AccountController {
             Account updatedAccountDetails = Account.builder()
                     .email(request.getEmail())
                     .role(request.getRole())
-                    .status(Status.valueOf(request.getStatus()))
+                    .status(Objects.equals(request.getStatus(), Status.ACCOUNT_ACTIVE.getValue()) ? Status.ACCOUNT_ACTIVE : Status.ACCOUNT_INACTIVE)
                     .build();
-            
             Account updatedAccount = accountService.updateAccount(id, updatedAccountDetails);
             AccountResponseDTO response = mapToResponseDTO(updatedAccount);
             
@@ -120,6 +121,7 @@ public class AccountController {
             
             List<Account> accounts = accountService.getAllAccounts();
             List<AccountResponseDTO> responseList = accounts.stream()
+                    .filter(a -> a.getRole() != Role.ADMIN)
                     .map(this::mapToResponseDTO)
                     .collect(Collectors.toList());
             
@@ -191,7 +193,7 @@ public class AccountController {
                 .email(account.getEmail())
                 .role(account.getRole())
                 .registerDate(account.getRegisterDate())
-                .status(account.getStatus())
+                .status(account.getStatus().getValue())
                 .build();
     }
 }
