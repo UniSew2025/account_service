@@ -50,7 +50,7 @@ public class AccountServiceApplication {
 
                     accountRepo.save(
                             Account.builder()
-                                    .email("kenkami296@gmail.com")
+                                    .email("andanh4004@gmail.com")
                                     .role(Role.DESIGNER)
                                     .registerDate(LocalDate.now())
                                     .status(Status.ACCOUNT_ACTIVE)

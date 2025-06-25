@@ -16,8 +16,7 @@ import java.time.LocalDate;
 public class AccountResponseDTO {
     private Integer id;
     private String email;
-    private String name;
     private Role role;
     private LocalDate registerDate;
-    private Status status;
+    private String status;
 }
