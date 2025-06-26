@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getTransactionById(@PathVariable Integer id) {
         try {
             log.info("Fetching transaction with ID: {}", id);
@@ -49,6 +51,7 @@ public class TransactionController {
     }
 
     @GetMapping("/account/{accountId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getTransactionsByAccountId(@PathVariable Integer accountId) {
         try {
             log.info("Fetching transactions for account ID: {}", accountId);
@@ -71,6 +74,7 @@ public class TransactionController {
     }
 
     @GetMapping("/wallet/{walletId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getTransactionsByWalletId(@PathVariable Integer walletId) {
         try {
             log.info("Fetching transactions for wallet ID: {}", walletId);
@@ -93,6 +97,7 @@ public class TransactionController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updateTransactionStatus(
             @PathVariable Integer id, 
             @Valid @RequestBody TransactionDTO request) {
@@ -129,6 +134,7 @@ public class TransactionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAllTransactions() {
         try {
             log.info("Fetching all transactions");
@@ -148,6 +154,7 @@ public class TransactionController {
     }
 
     @GetMapping("/account/{accountId}/summary")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getTransactionSummaryByAccountId(@PathVariable Integer accountId) {
         try {
             log.info("Fetching transaction summary for account ID: {}", accountId);

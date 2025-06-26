@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> createAccount(@Valid @RequestBody AccountRequestDTO request) {
         try {
             log.info("Creating new account with email: {}", request.getEmail());
@@ -49,6 +51,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAccountById(@PathVariable Integer id) {
         try {
             log.info("Fetching account with ID: {}", id);
@@ -71,6 +74,7 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updateAccount(@PathVariable Integer id, @Valid @RequestBody AccountRequestDTO request) {
         try {
             log.info("Updating account with ID: {}", id);
@@ -96,6 +100,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> deleteAccount(@PathVariable Integer id) {
         try {
             log.info("Deleting account with ID: {}", id);
@@ -115,6 +120,7 @@ public class AccountController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAllAccounts() {
         try {
             log.info("Fetching all accounts");
@@ -135,6 +141,7 @@ public class AccountController {
     }
 
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAccountByEmail(@PathVariable String email) {
         try {
             log.info("Fetching account with email: {}", email);
@@ -157,6 +164,7 @@ public class AccountController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> updateAccountStatus(@PathVariable Integer id, @RequestParam String status) {
         try {
             log.info("Updating account status for ID: {} to status: {}", id, status);
