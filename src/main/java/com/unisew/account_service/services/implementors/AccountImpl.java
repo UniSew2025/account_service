@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -128,5 +130,20 @@ public class AccountImpl implements AccountService {
             log.error("Error saving updated account status {}: {}", id, e.getMessage(), e);
             throw new RuntimeException("Failed to update account status: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public Map<String, Object> getAccountById(int id) {
+        Account account = accountRepo.findById(id).orElse(null);
+        if (account == null) {
+            return null;
+        }
+        Map<String, Object> accData = new HashMap<>();
+        accData.put("id", account.getId());
+        accData.put("email", account.getEmail());
+        accData.put("role", account.getRole().getValue().toLowerCase());
+        accData.put("registerDate", account.getRegisterDate());
+        accData.put("status", account.getStatus().getValue().toLowerCase());
+        return accData;
     }
 }

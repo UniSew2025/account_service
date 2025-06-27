@@ -4,6 +4,7 @@ import com.unisew.account_service.enums.Status;
 import com.unisew.account_service.models.Account;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface AccountService {
@@ -14,4 +15,6 @@ public interface AccountService {
     List<Account> getAllAccounts();
     Optional<Account> getAccountByEmail(String email);
     Account updateAccountStatus(Integer id, Status status);
+
+    Map<String, Object> getAccountById(int id);
 }
