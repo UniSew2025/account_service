@@ -29,74 +29,32 @@ public class AccountController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> createAccount(@Valid @RequestBody AccountRequestDTO request) {
-        try {
-            log.info("Creating new account with email: {}", request.getEmail());
-            
-            Account account = Account.builder()
-                    .email(request.getEmail())
-                    .role(request.getRole())
-                    .build();
-            
-            Account createdAccount = accountService.createAccount(account);
-            AccountResponseDTO response = mapToResponseDTO(createdAccount);
-            
-            log.info("Account created successfully with ID: {}", createdAccount.getId());
-            return ResponseBuilder.build(HttpStatus.CREATED, "Account created successfully", response);
-            
-        } catch (Exception e) {
-            log.error("Error creating account: {}", e.getMessage(), e);
-            return ResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create account: " + e.getMessage(), null);
-        }
+    public ResponseEntity<AccountResponseDTO> createAccount(@Valid @RequestBody AccountRequestDTO request) {
+        AccountResponseDTO responseDTO = accountService.createAccount(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(responseDTO);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> getAccountById(@PathVariable Integer id) {
-        try {
-            log.info("Fetching account with ID: {}", id);
-            
-            return accountService.getAccountById(id)
-                    .map(account -> {
-                        AccountResponseDTO response = mapToResponseDTO(account);
-                        log.info("Account found with ID: {}", id);
-                        return ResponseBuilder.build(HttpStatus.OK, "Account retrieved successfully", response);
-                    })
-                    .orElseGet(() -> {
-                        log.warn("Account not found with ID: {}", id);
-                        return ResponseBuilder.build(HttpStatus.NOT_FOUND, "Account not found", null);
-                    });
-                    
-        } catch (Exception e) {
-            log.error("Error retrieving account with ID {}: {}", id, e.getMessage(), e);
-            return ResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve account: " + e.getMessage(), null);
-        }
+    public ResponseEntity<AccountResponseDTO> getAccountById(@PathVariable Integer id) {
+       AccountResponseDTO responseDTO = accountService.getAccountById(id).get();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(responseDTO);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> updateAccount(@PathVariable Integer id, @Valid @RequestBody AccountRequestDTO request) {
-        try {
-            log.info("Updating account with ID: {}", id);
-            
-            Account updatedAccountDetails = Account.builder()
-                    .email(request.getEmail())
-                    .role(request.getRole())
-                    .status(Objects.equals(request.getStatus(), Status.ACCOUNT_ACTIVE.getValue()) ? Status.ACCOUNT_ACTIVE : Status.ACCOUNT_INACTIVE)
-                    .build();
-            Account updatedAccount = accountService.updateAccount(id, updatedAccountDetails);
-            AccountResponseDTO response = mapToResponseDTO(updatedAccount);
-            
-            log.info("Account updated successfully with ID: {}", id);
-            return ResponseBuilder.build(HttpStatus.OK, "Account updated successfully", response);
-            
-        } catch (RuntimeException e) {
-            log.error("Error updating account {}: {}", id, e.getMessage());
-            return ResponseBuilder.build(HttpStatus.NOT_FOUND, e.getMessage(), null);
-        } catch (Exception e) {
-            log.error("Error updating account with ID {}: {}", id, e.getMessage(), e);
-            return ResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update account: " + e.getMessage(), null);
+    public ResponseEntity<AccountResponseDTO> updateAccount(@PathVariable Integer id, @Valid @RequestBody AccountRequestDTO request) {
+       AccountResponseDTO responseDTO = accountService.updateAccount(id, request);
+        if (Objects.isNull(responseDTO)) {
+            log.error("Account with ID {} not found for update", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+        log.info("Account with ID {} updated successfully", id);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping("/{id}")
@@ -121,87 +79,19 @@ public class AccountController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> getAllAccounts() {
-        try {
-            log.info("Fetching all accounts");
-            
-            List<Account> accounts = accountService.getAllAccounts();
-            List<AccountResponseDTO> responseList = accounts.stream()
-                    .filter(a -> a.getRole() != Role.ADMIN)
-                    .map(this::mapToResponseDTO)
-                    .collect(Collectors.toList());
-            
-            log.info("Retrieved {} accounts", accounts.size());
-            return ResponseBuilder.build(HttpStatus.OK, "Accounts retrieved successfully", responseList);
-            
-        } catch (Exception e) {
-            log.error("Error retrieving all accounts: {}", e.getMessage(), e);
-            return ResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve accounts: " + e.getMessage(), null);
-        }
+    public ResponseEntity<List<AccountResponseDTO>> getAllAccounts() {
+        List<AccountResponseDTO> accounts = accountService.getAllAccounts();
+        return accounts.isEmpty()
+                ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+                : ResponseEntity.ok(accounts);
     }
 
     @GetMapping("/email/{email}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> getAccountByEmail(@PathVariable String email) {
-        try {
-            log.info("Fetching account with email: {}", email);
-            
-            return accountService.getAccountByEmail(email)
-                    .map(account -> {
-                        AccountResponseDTO response = mapToResponseDTO(account);
-                        log.info("Account found with email: {}", email);
-                        return ResponseBuilder.build(HttpStatus.OK, "Account retrieved successfully", response);
-                    })
-                    .orElseGet(() -> {
-                        log.warn("Account not found with email: {}", email);
-                        return ResponseBuilder.build(HttpStatus.NOT_FOUND, "Account not found", null);
-                    });
-            
-        } catch (Exception e) {
-            log.error("Error retrieving account with email {}: {}", email, e.getMessage(), e);
-            return ResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve account: " + e.getMessage(), null);
-        }
+    public ResponseEntity<AccountResponseDTO> getAccountByEmail(@PathVariable String email) {
+        return accountService.getAccountByEmail(email)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseObject> updateAccountStatus(@PathVariable Integer id, @RequestParam String status) {
-        try {
-            log.info("Updating account status for ID: {} to status: {}", id, status);
-            
-            Status accountStatus;
-            try {
-                accountStatus = Status.valueOf(status.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                log.error("Invalid status value: {}", status);
-                return ResponseBuilder.build(HttpStatus.BAD_REQUEST, "Invalid status value: " + status, null);
-            }
-            
-            Account updatedAccount = accountService.updateAccountStatus(id, accountStatus);
-            AccountResponseDTO response = mapToResponseDTO(updatedAccount);
-            
-            log.info("Account status updated successfully for ID: {}", id);
-            return ResponseBuilder.build(HttpStatus.OK, "Account status updated successfully", response);
-            
-        } catch (RuntimeException e) {
-            log.error("Error updating account status for ID {}: {}", id, e.getMessage());
-            return ResponseBuilder.build(HttpStatus.NOT_FOUND, e.getMessage(), null);
-        } catch (Exception e) {
-            log.error("Error updating account status for ID {}: {}", id, e.getMessage(), e);
-            return ResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update account status: " + e.getMessage(), null);
-        }
-    }
-
-    /**
-     * Helper method to map Account entity to AccountResponseDTO
-     */
-    private AccountResponseDTO mapToResponseDTO(Account account) {
-        return AccountResponseDTO.builder()
-                .id(account.getId())
-                .email(account.getEmail())
-                .role(account.getRole())
-                .registerDate(account.getRegisterDate())
-                .status(account.getStatus().getValue())
-                .build();
-    }
 }

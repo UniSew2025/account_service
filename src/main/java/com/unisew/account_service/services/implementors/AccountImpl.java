@@ -1,10 +1,13 @@
 package com.unisew.account_service.services.implementors;
 
+import com.unisew.account_service.enums.Role;
 import com.unisew.account_service.enums.Status;
 import com.unisew.account_service.models.Account;
 import com.unisew.account_service.models.Wallet;
 import com.unisew.account_service.repositories.AccountRepo;
 import com.unisew.account_service.repositories.WalletRepo;
+import com.unisew.account_service.requests.AccountRequestDTO;
+import com.unisew.account_service.responses.AccountResponseDTO;
 import com.unisew.account_service.services.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,21 +29,23 @@ public class AccountImpl implements AccountService {
 
     @Override
     @Transactional
-    public Account createAccount(Account account) {
+    public AccountResponseDTO createAccount(AccountRequestDTO request) {
         try {
+           Account account = new Account();
+            account.setEmail(request.getEmail());
+            account.setRole(request.getRole());
             account.setRegisterDate(LocalDate.now());
             account.setStatus(Status.ACCOUNT_ACTIVE);
-
-            Account savedAccount = accountRepo.save(account);
-
             Wallet wallet = Wallet.builder()
                     .balance(0)
-                    .account(savedAccount)
+                    .account(account)
                     .build();
             walletRepo.save(wallet);
 
-            savedAccount.setWallet(wallet);
-            return savedAccount;
+            account.setWallet(wallet);
+            accountRepo.save(account);
+
+            return mapToResponseDTO(account);
         } catch (Exception e) {
             log.error("Error creating account and wallet: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to create account: " + e.getMessage(), e);
@@ -49,16 +54,17 @@ public class AccountImpl implements AccountService {
 
     @Override
     @Transactional
-    public Account updateAccount(Integer id, Account updatedAccountDetails) {
+    public AccountResponseDTO updateAccount(Integer id, AccountRequestDTO request) {
         try {
             Account existingAccount = accountRepo.findById(id)
                     .orElseThrow(() -> new RuntimeException("Account not found with ID: " + id));
-            if (updatedAccountDetails.getEmail() != null && !updatedAccountDetails.getEmail().isEmpty()) {
-                existingAccount.setEmail(updatedAccountDetails.getEmail());
+            if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+                existingAccount.setEmail(request.getEmail());
             }
-            existingAccount.setStatus(updatedAccountDetails.getStatus());
-            existingAccount.setRole(updatedAccountDetails.getRole());
-            return accountRepo.save(existingAccount);
+            existingAccount.setStatus(Status.valueOf(request.getStatus()));
+            existingAccount.setRole(request.getRole());
+            accountRepo.save(existingAccount);
+            return mapToResponseDTO(existingAccount);
         } catch (RuntimeException e) {
             log.error("Error updating account {}: {}", id, e.getMessage());
             throw e;
@@ -86,9 +92,9 @@ public class AccountImpl implements AccountService {
     }
 
     @Override
-    public Optional<Account> getAccountById(Integer id) {
+    public Optional<AccountResponseDTO> getAccountById(Integer id) {
         try {
-            return accountRepo.findById(id);
+            return accountRepo.findById(id).map(this::mapToResponseDTO);
         } catch (Exception e) {
             log.error("Error retrieving account with ID {}: {}", id, e.getMessage());
             return Optional.empty();
@@ -96,9 +102,11 @@ public class AccountImpl implements AccountService {
     }
 
     @Override
-    public List<Account> getAllAccounts() {
+    public List<AccountResponseDTO> getAllAccounts() {
         try {
-            return accountRepo.findAll();
+            return accountRepo.findAll().stream().map(this::mapToResponseDTO)
+                    .filter(account -> account.getRole() != Role.ADMIN)
+                    .toList();
         } catch (Exception e) {
             log.error("Error retrieving all accounts: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to retrieve all accounts: " + e.getMessage(), e);
@@ -106,9 +114,9 @@ public class AccountImpl implements AccountService {
     }
 
     @Override
-    public Optional<Account> getAccountByEmail(String email) {
+    public Optional<AccountResponseDTO> getAccountByEmail(String email) {
         try {
-            return accountRepo.findByEmail(email);
+            return accountRepo.findByEmail(email).map(this::mapToResponseDTO);
         } catch (Exception e) {
             log.error("Error retrieving account with email {}: {}", email, e.getMessage());
             return Optional.empty();
@@ -130,6 +138,16 @@ public class AccountImpl implements AccountService {
             log.error("Error saving updated account status {}: {}", id, e.getMessage(), e);
             throw new RuntimeException("Failed to update account status: " + e.getMessage(), e);
         }
+    }
+
+    private AccountResponseDTO mapToResponseDTO(Account account) {
+        return AccountResponseDTO.builder()
+                .id(account.getId())
+                .email(account.getEmail())
+                .role(account.getRole())
+                .registerDate(account.getRegisterDate())
+                .status(account.getStatus().getValue())
+                .build();
     }
 
     @Override
