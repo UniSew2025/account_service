@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountResponseDTO> createAccount(@Valid @RequestBody AccountRequestDTO request) {
         AccountResponseDTO responseDTO = accountService.createAccount(request);
         return ResponseEntity
@@ -35,6 +37,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountResponseDTO> getAccountById(@PathVariable Integer id) {
        AccountResponseDTO responseDTO = accountService.getAccountById(id).get();
         return ResponseEntity
@@ -43,6 +46,7 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountResponseDTO> updateAccount(@PathVariable Integer id, @Valid @RequestBody AccountRequestDTO request) {
        AccountResponseDTO responseDTO = accountService.updateAccount(id, request);
         if (Objects.isNull(responseDTO)) {
@@ -54,6 +58,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> deleteAccount(@PathVariable Integer id) {
         try {
             log.info("Deleting account with ID: {}", id);
@@ -73,6 +78,7 @@ public class AccountController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AccountResponseDTO>> getAllAccounts() {
         List<AccountResponseDTO> accounts = accountService.getAllAccounts();
         return accounts.isEmpty()
@@ -81,6 +87,7 @@ public class AccountController {
     }
 
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountResponseDTO> getAccountByEmail(@PathVariable String email) {
         return accountService.getAccountByEmail(email)
                 .map(ResponseEntity::ok)

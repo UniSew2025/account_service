@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -27,6 +28,7 @@ public class WalletController {
     private final WalletService walletService;
 
     @PostMapping("/deposit")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> deposit(@Valid @RequestBody WalletRequestDTO request) {
         try {
             log.info("Processing deposit request for account ID: {} with amount: {}", 
@@ -57,6 +59,7 @@ public class WalletController {
     }
 
     @PostMapping("/withdraw")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> withdraw(@Valid @RequestBody WalletRequestDTO request) {
         try {
             log.info("Processing withdraw request for account ID: {} with amount: {}", 
@@ -87,6 +90,7 @@ public class WalletController {
     }
 
     @PostMapping("/transfer")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> transfer(@Valid @RequestBody WalletRequestDTO request) {
         try {
             log.info("Processing transfer request from account ID: {} to account ID: {} with amount: {}", 
@@ -128,6 +132,7 @@ public class WalletController {
     }
 
     @GetMapping("/{accountId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getWalletByAccountId(@PathVariable Integer accountId) {
         try {
             log.info("Fetching wallet for account ID: {}", accountId);
@@ -150,6 +155,7 @@ public class WalletController {
     }
 
     @GetMapping("/{accountId}/balance")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getWalletBalance(@PathVariable Integer accountId) {
         try {
             log.info("Fetching wallet balance for account ID: {}", accountId);
@@ -172,6 +178,7 @@ public class WalletController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAllWallets() {
         try {
             log.info("Fetching all wallets");
