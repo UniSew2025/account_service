@@ -51,6 +51,9 @@ public class Account {
     @Enumerated(EnumType.STRING)
     Status status;
 
+    @Column(name = "`google_refresh_token`")
+    String ggRefreshToken;
+
     @OneToOne(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     @ToString.Exclude

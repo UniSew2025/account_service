@@ -16,4 +16,5 @@ public class LoginRequest {
     String email;
     String avatar;
     String name;
+    String refreshToken;
 }

@@ -34,6 +34,9 @@ public class AuthImpl implements AuthService {
     @Value("${google.client_id}")
     private String clientId;
 
+    @Value("${google.client_secret}")
+    private String clientSecret;
+
     @Value("${google.redirect_uri}")
     private String redirectUri;
 
@@ -49,7 +52,9 @@ public class AuthImpl implements AuthService {
         String url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + clientId
                 + "&redirect_uri=" + redirectUri
                 + "&response_type=" + responseType
-                + "&scope=" + scope;
+                + "&scope=" + scope
+                + "&access_type=offline"
+                + "&prompt=consent";
         data.put("url", url);
 
         return ResponseBuilder.build(HttpStatus.OK, "", data);
@@ -61,6 +66,8 @@ public class AuthImpl implements AuthService {
         if (account == null) {
             return createAccount(request);
         }
+        account.setGgRefreshToken(request.getRefreshToken());
+        account = accountRepo.save(account);
         Map<String, Object> data = buildAccountResponse(account);
         data.put("profile", profileService.getProfile(account.getId()));
 
@@ -73,6 +80,7 @@ public class AuthImpl implements AuthService {
                         .registerDate(LocalDate.now())
                         .email(request.getEmail())
                         .role(Role.SCHOOL)
+                        .ggRefreshToken(request.getRefreshToken())
                         .status(Status.ACCOUNT_ACTIVE)
                         .build()
         );
