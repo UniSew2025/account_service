@@ -8,4 +8,6 @@ public interface AuthService {
     ResponseEntity<ResponseObject> getGoogleUrl();
 
     ResponseEntity<ResponseObject> login(LoginRequest request);
+
+    ResponseEntity<ResponseObject> getGoogleAccessToken(int accountId);
 }

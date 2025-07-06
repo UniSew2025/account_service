@@ -16,6 +16,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.http.HttpEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -72,6 +78,57 @@ public class AuthImpl implements AuthService {
         data.put("profile", profileService.getProfile(account.getId()));
 
         return ResponseBuilder.build(HttpStatus.OK, "Login successfully", data);
+    }
+
+    @Override
+    public ResponseEntity<ResponseObject> getGoogleAccessToken(int accountId) {
+        Account account = accountRepo.findById(accountId).orElse(null);
+        if (account == null || account.getGgRefreshToken() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ResponseObject.builder()
+                            .message("No refresh token for this account")
+                            .build()
+            );
+        }
+        String refreshToken = account.getGgRefreshToken();
+        try {
+            String accessToken = getGoogleAccessTokenFromRefreshToken(refreshToken);
+            Map<String, Object> res = new HashMap<>();
+            res.put("access_token", accessToken);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ResponseObject.builder()
+                            .data(res)
+                            .message("Google access token fetched successfully")
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ResponseObject.builder()
+                            .message("Cannot get access token: " + e.getMessage())
+                            .build()
+            );
+
+        }
+    }
+
+    private String getGoogleAccessTokenFromRefreshToken(String refreshToken) throws Exception {
+        String tokenEndpoint = "https://oauth2.googleapis.com/token";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", clientId);
+        params.add("client_secret", clientSecret);
+        params.add("refresh_token", refreshToken);
+        params.add("grant_type", "refresh_token");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, Object> resp = restTemplate.postForObject(tokenEndpoint, request, Map.class);
+        if (resp != null && resp.containsKey("access_token")) {
+            return (String) resp.get("access_token");
+        }
+        throw new Exception("No access_token in response");
     }
 
     private ResponseEntity<ResponseObject> createAccount(LoginRequest request) {
