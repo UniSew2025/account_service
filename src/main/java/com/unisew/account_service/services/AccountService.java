@@ -17,6 +17,5 @@ public interface AccountService {
     List<AccountResponseDTO> getAllAccounts();
     Optional<AccountResponseDTO> getAccountByEmail(String email);
     Account updateAccountStatus(Integer id, Status status);
-
     Map<String, Object> getAccountById(int id);
 }
