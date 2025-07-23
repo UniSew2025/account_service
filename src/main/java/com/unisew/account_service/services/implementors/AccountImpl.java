@@ -154,12 +154,11 @@ public class AccountImpl implements AccountService {
     }
 
     private AccountResponseDTO mapToResponseDTO(Account account) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         return AccountResponseDTO.builder()
                 .id(account.getId())
                 .email(account.getEmail())
                 .role(account.getRole())
-                .registerDate(account.getRegisterDate().format(formatter))
+                .registerDate(account.getRegisterDate())
                 .status(account.getStatus().getValue())
                 .build();
     }

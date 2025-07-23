@@ -17,6 +17,6 @@ public class AccountResponseDTO {
     private Integer id;
     private String email;
     private Role role;
-    private String registerDate;
+    private LocalDate registerDate;
     private String status;
 }
