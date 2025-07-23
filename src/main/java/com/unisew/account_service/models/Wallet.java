@@ -40,8 +40,6 @@ public class Wallet {
     @Column(name = "`card_expired_date`")
     String cardExpiredDate;
 
-    int cvv;
-
     @OneToOne
     @MapsId
     @JoinColumn(name = "`account_id`")

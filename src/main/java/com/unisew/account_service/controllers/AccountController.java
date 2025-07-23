@@ -77,13 +77,10 @@ public class AccountController {
         }
     }
 
-    @GetMapping
+    @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AccountResponseDTO>> getAllAccounts() {
-        List<AccountResponseDTO> accounts = accountService.getAllAccounts();
-        return accounts.isEmpty()
-                ? ResponseEntity.status(HttpStatus.NO_CONTENT).build()
-                : ResponseEntity.ok(accounts);
+    public ResponseEntity<ResponseObject> getAllAccounts() {
+        return accountService.getAllAccounts();
     }
 
     @GetMapping("/email/{email}")

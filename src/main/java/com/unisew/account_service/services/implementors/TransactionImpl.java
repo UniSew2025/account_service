@@ -77,8 +77,7 @@ public class TransactionImpl implements TransactionService {
                     .status(status)
                     .paymentGatewayCode(null)
                     .paymentGatewayMessage(null)
-                    .orderId(0)
-                    .designRequestId(0)
+                    .itemId(null)
                     .wallet(associatedWallet)
                     .build();
 

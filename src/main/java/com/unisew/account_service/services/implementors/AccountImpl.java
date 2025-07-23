@@ -8,13 +8,17 @@ import com.unisew.account_service.repositories.AccountRepo;
 import com.unisew.account_service.repositories.WalletRepo;
 import com.unisew.account_service.requests.AccountRequestDTO;
 import com.unisew.account_service.responses.AccountResponseDTO;
+import com.unisew.account_service.responses.ResponseObject;
 import com.unisew.account_service.services.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +35,7 @@ public class AccountImpl implements AccountService {
     @Transactional
     public AccountResponseDTO createAccount(AccountRequestDTO request) {
         try {
-           Account account = new Account();
+            Account account = new Account();
             account.setEmail(request.getEmail());
             account.setRole(request.getRole());
             account.setRegisterDate(LocalDate.now());
@@ -102,15 +106,24 @@ public class AccountImpl implements AccountService {
     }
 
     @Override
-    public List<AccountResponseDTO> getAllAccounts() {
-        try {
-            return accountRepo.findAll().stream().map(this::mapToResponseDTO)
-                    .filter(account -> account.getRole() != Role.ADMIN)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error retrieving all accounts: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to retrieve all accounts: " + e.getMessage(), e);
+    public ResponseEntity<ResponseObject> getAllAccounts() {
+        List<AccountResponseDTO> accounts = accountRepo.findAll().stream().map(this::mapToResponseDTO)
+                .filter(account -> account.getRole() != Role.ADMIN)
+                .toList();
+        if (accounts.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    ResponseObject.builder()
+                            .message("No accounts found")
+                            .data(accounts)
+                            .build()
+            );
         }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ResponseObject.builder()
+                        .message("Successfully")
+                        .data(accounts)
+                        .build()
+        );
     }
 
     @Override
@@ -141,11 +154,12 @@ public class AccountImpl implements AccountService {
     }
 
     private AccountResponseDTO mapToResponseDTO(Account account) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         return AccountResponseDTO.builder()
                 .id(account.getId())
                 .email(account.getEmail())
                 .role(account.getRole())
-                .registerDate(account.getRegisterDate())
+                .registerDate(account.getRegisterDate().format(formatter))
                 .status(account.getStatus().getValue())
                 .build();
     }

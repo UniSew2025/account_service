@@ -60,11 +60,8 @@ public class Transaction {
     @Column(name = "`payment_gateway_message`")
     String paymentGatewayMessage;
 
-    @Column(name = "`order_id`")
-    int orderId;
-
-    @Column(name = "`design_request_id`")
-    int designRequestId;
+    @Column(name = "`item_id`")
+    Integer itemId;
 
     @ManyToOne
     @JoinColumn(name = "`sender_id`")

@@ -217,8 +217,7 @@ public class WalletController {
                 .status(transaction.getStatus())
                 .paymentGatewayCode(transaction.getPaymentGatewayCode())
                 .paymentGatewayMessage(transaction.getPaymentGatewayMessage())
-                .orderId(transaction.getOrderId())
-                .designRequestId(transaction.getDesignRequestId())
+                .itemId(transaction.getItemId())
                 .walletId(transaction.getWallet() != null ? transaction.getWallet().getId() : null)
                 .build();
     }

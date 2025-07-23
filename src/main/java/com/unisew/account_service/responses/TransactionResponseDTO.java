@@ -23,7 +23,6 @@ public class TransactionResponseDTO {
     private Status status;
     private String paymentGatewayCode;
     private String paymentGatewayMessage;
-    private Integer orderId;
-    private Integer designRequestId;
+    private Integer itemId;
     private Integer walletId;
 }
