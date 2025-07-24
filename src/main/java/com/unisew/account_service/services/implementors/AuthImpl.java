@@ -72,6 +72,9 @@ public class AuthImpl implements AuthService {
         if (account == null) {
             return createAccount(request);
         }
+        if(account.getStatus().equals(Status.ACCOUNT_INACTIVE)){
+            return ResponseBuilder.build(HttpStatus.UNAUTHORIZED, "Account is inactive", account);
+        }
         account.setGgRefreshToken(request.getRefreshToken());
         account = accountRepo.save(account);
         Map<String, Object> data = buildAccountResponse(account);
