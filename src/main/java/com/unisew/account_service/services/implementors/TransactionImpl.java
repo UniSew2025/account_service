@@ -8,15 +8,20 @@ import com.unisew.account_service.models.Wallet;
 import com.unisew.account_service.repositories.AccountRepo;
 import com.unisew.account_service.repositories.TransactionRepo;
 import com.unisew.account_service.repositories.WalletRepo;
+import com.unisew.account_service.responses.ResponseObject;
 import com.unisew.account_service.services.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -150,12 +155,29 @@ public class TransactionImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> getAllTransactions() {
-        try {
-            return transactionRepository.findAll();
-        } catch (Exception e) {
-            log.error("Error retrieving all transactions: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to retrieve all transactions: " + e.getMessage(), e);
-        }
+    public ResponseEntity<ResponseObject> getAllTransactions() {
+        List<Map<String, Object>> data = transactionRepository.findAll().stream()
+                .map(transaction -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", transaction.getId());
+                    map.put("senderName", transaction.getSenderName());
+                    map.put("receiverName", transaction.getReceiverName());
+                    map.put("amount", transaction.getAmount());
+                    map.put("paymentType", transaction.getPaymentType());
+                    map.put("note", transaction.getNote());
+                    map.put("creationDate", transaction.getCreationDate());
+                    map.put("status", transaction.getStatus());
+                    map.put("paymentGatewayCode", transaction.getPaymentGatewayCode());
+                    map.put("paymentGatewayMessage", transaction.getPaymentGatewayMessage());
+                    return map;
+                })
+                .toList();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ResponseObject.builder()
+                        .message("All transactions retrieved successfully")
+                        .data(data)
+                        .build()
+        );
     }
+
 }

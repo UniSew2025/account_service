@@ -3,6 +3,8 @@ package com.unisew.account_service.services;
 import com.unisew.account_service.enums.PaymentType;
 import com.unisew.account_service.enums.Status;
 import com.unisew.account_service.models.Transaction;
+import com.unisew.account_service.responses.ResponseObject;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,5 +15,5 @@ public interface TransactionService {
     List<Transaction> getTransactionsByAccountId(Integer accountId);
     List<Transaction> getTransactionsByWalletId(Integer walletId);
     Transaction updateTransactionStatus(Integer transactionId, Status newStatus, String gatewayCode, String gatewayMessage);
-    List<Transaction> getAllTransactions();
+    ResponseEntity<ResponseObject> getAllTransactions();
 }

@@ -50,7 +50,7 @@ public class AccountServiceApplication {
 
                     accountRepo.save(
                             Account.builder()
-                                    .email("andanh4004@gmail.com")
+                                    .email("nguyenngoctram76213@gmail.com")
                                     .role(Role.DESIGNER)
                                     .registerDate(LocalDate.now())
                                     .status(Status.ACCOUNT_ACTIVE)
@@ -59,7 +59,7 @@ public class AccountServiceApplication {
 
                     accountRepo.save(
                             Account.builder()
-                                    .email("quocvdkse160940@fpt.edu.vn")
+                                    .email("nguyenngoctram7621@gmail.com")
                                     .role(Role.GARMENT_FACTORY)
                                     .registerDate(LocalDate.now())
                                     .status(Status.ACCOUNT_ACTIVE)

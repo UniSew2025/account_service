@@ -3,6 +3,7 @@ package com.unisew.account_service.services;
 import com.unisew.account_service.enums.Status;
 import com.unisew.account_service.models.Account;
 import com.unisew.account_service.requests.AccountRequestDTO;
+import com.unisew.account_service.requests.CreateAccountRequest;
 import com.unisew.account_service.responses.AccountResponseDTO;
 import com.unisew.account_service.responses.ResponseObject;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface AccountService {
-    AccountResponseDTO createAccount(AccountRequestDTO request);
-    AccountResponseDTO updateAccount(Integer id, AccountRequestDTO request);
+    ResponseEntity<ResponseObject> createAccount(CreateAccountRequest request);
+    ResponseEntity<ResponseObject> updateAccount(Integer id, AccountRequestDTO request);
     void deleteAccount(Integer id);
     Optional<AccountResponseDTO> getAccountById(Integer id);
     ResponseEntity<ResponseObject> getAllAccounts();

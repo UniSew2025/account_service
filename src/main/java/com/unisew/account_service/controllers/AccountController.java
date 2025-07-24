@@ -1,24 +1,25 @@
 package com.unisew.account_service.controllers;
 
-import com.unisew.account_service.enums.Role;
-import com.unisew.account_service.enums.Status;
-import com.unisew.account_service.models.Account;
 import com.unisew.account_service.requests.AccountRequestDTO;
+import com.unisew.account_service.requests.CreateAccountRequest;
 import com.unisew.account_service.responses.AccountResponseDTO;
 import com.unisew.account_service.responses.ResponseObject;
 import com.unisew.account_service.services.AccountService;
 import com.unisew.account_service.utils.ResponseBuilder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,13 +28,10 @@ import java.util.stream.Collectors;
 public class AccountController {
     private final AccountService accountService;
 
-    @PostMapping
+    @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AccountResponseDTO> createAccount(@Valid @RequestBody AccountRequestDTO request) {
-        AccountResponseDTO responseDTO = accountService.createAccount(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(responseDTO);
+    public ResponseEntity<ResponseObject> createAccount(@RequestBody CreateAccountRequest request) {
+        return accountService.createAccount(request);
     }
 
     @GetMapping("/{id}")
@@ -47,14 +45,8 @@ public class AccountController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AccountResponseDTO> updateAccount(@PathVariable Integer id, @Valid @RequestBody AccountRequestDTO request) {
-       AccountResponseDTO responseDTO = accountService.updateAccount(id, request);
-        if (Objects.isNull(responseDTO)) {
-            log.error("Account with ID {} not found for update", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        log.info("Account with ID {} updated successfully", id);
-        return ResponseEntity.ok(responseDTO);
+    public ResponseEntity<ResponseObject> updateAccount(@PathVariable(name = "id") Integer id, @RequestBody AccountRequestDTO request) {
+       return accountService.updateAccount(id, request);
     }
 
     @DeleteMapping("/{id}")

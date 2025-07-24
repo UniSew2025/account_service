@@ -133,24 +133,10 @@ public class TransactionController {
         }
     }
 
-    @GetMapping
+    @GetMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseObject> getAllTransactions() {
-        try {
-            log.info("Fetching all transactions");
-            
-            List<Transaction> transactions = transactionService.getAllTransactions();
-            List<TransactionResponseDTO> responseList = transactions.stream()
-                    .map(this::mapToTransactionResponseDTO)
-                    .collect(Collectors.toList());
-            
-            log.info("Retrieved {} transactions", transactions.size());
-            return ResponseBuilder.build(HttpStatus.OK, "Transactions retrieved successfully", responseList);
-            
-        } catch (Exception e) {
-            log.error("Error retrieving all transactions: {}", e.getMessage(), e);
-            return ResponseBuilder.build(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve transactions: " + e.getMessage(), null);
-        }
+        return transactionService.getAllTransactions();
     }
 
     @GetMapping("/account/{accountId}/summary")

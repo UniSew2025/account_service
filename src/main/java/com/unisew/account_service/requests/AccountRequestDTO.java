@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,11 +19,9 @@ import java.time.LocalDate;
 @Builder
 
 public class AccountRequestDTO {
-    @NotBlank(message = "email is required")
-    @Email
     private String email;
     private Role role;
-    private String name;
-    private RegisterType registerType;
     private String status;
+    private List<Integer> packageIds;
+    private int garmentId;
 }

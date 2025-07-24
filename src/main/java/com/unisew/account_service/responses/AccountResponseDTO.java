@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +20,5 @@ public class AccountResponseDTO {
     private Role role;
     private LocalDate registerDate;
     private String status;
+    private Object partner;
 }
