@@ -8,6 +8,7 @@ import com.unisew.account_service.repositories.AccountRepo;
 import com.unisew.account_service.repositories.WalletRepo;
 import com.unisew.account_service.requests.AccountRequestDTO;
 import com.unisew.account_service.requests.CreateAccountRequest;
+import com.unisew.account_service.requests.CreateProfileRequest;
 import com.unisew.account_service.responses.AccountResponseDTO;
 import com.unisew.account_service.responses.ResponseObject;
 import com.unisew.account_service.services.AccountService;
@@ -40,29 +41,36 @@ public class AccountImpl implements AccountService {
 
     @Override
     @Transactional
-    public  ResponseEntity<ResponseObject> createAccount(CreateAccountRequest request) {
+    public ResponseEntity<ResponseObject> createAccount(CreateAccountRequest request) {
 
-            if (accountRepo.existsByEmail(request.getEmail())) {
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        ResponseObject.builder()
-                                .message("This email is already registered")
-                                .build()
-                );
-            }
-            Account account = new Account();
-            account.setEmail(request.getEmail());
-            account.setRole(request.getRole());
-            account.setRegisterDate(LocalDate.now());
-            account.setStatus(Status.ACCOUNT_ACTIVE);
-            Wallet wallet = Wallet.builder()
-                    .balance(0)
-                    .account(account)
-                    .build();
-            walletRepo.save(wallet);
+        if (accountRepo.existsByEmail(request.getEmail())) {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ResponseObject.builder()
+                            .message("This email is already registered")
+                            .build()
+            );
+        }
+        Account account = new Account();
+        account.setEmail(request.getEmail());
+        account.setRole(request.getRole());
+        account.setRegisterDate(LocalDate.now());
+        account.setStatus(Status.ACCOUNT_ACTIVE);
 
-            account.setWallet(wallet);
-            accountRepo.save(account);
-
+        Wallet wallet = Wallet.builder()
+                .balance(0)
+                .account(account)
+                .build();
+        walletRepo.save(wallet);
+        account.setWallet(wallet);
+        accountRepo.save(account);
+        profileService.createProfile(
+                CreateProfileRequest.builder()
+                        .accountId(account.getId())
+                        .avatar("https://37assets.37signals.com/svn/765-default-avatar.png")
+                        .name(request.getEmail().replace("@gmail.com", ""))
+                        .role(request.getRole().toString().toLowerCase())
+                        .build()
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ResponseObject.builder()
                         .message("Create account successfully")

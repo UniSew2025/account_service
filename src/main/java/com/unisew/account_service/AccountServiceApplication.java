@@ -32,7 +32,7 @@ public class AccountServiceApplication {
                 if(accountRepo.count() == 0){
                     accountRepo.save(
                             Account.builder()
-                                    .email("nguyenngoctram7621@gmail.com")
+                                    .email("nguyenngoctram76211@gmail.com")
                                     .role(Role.ADMIN)
                                     .registerDate(LocalDate.now())
                                     .status(Status.ACCOUNT_ACTIVE)
@@ -59,7 +59,7 @@ public class AccountServiceApplication {
 
                     accountRepo.save(
                             Account.builder()
-                                    .email("nguyenngoctram7621@gmail.com")
+                                    .email("nguyenngoctram7622@gmail.com")
                                     .role(Role.GARMENT_FACTORY)
                                     .registerDate(LocalDate.now())
                                     .status(Status.ACCOUNT_ACTIVE)
@@ -68,7 +68,7 @@ public class AccountServiceApplication {
 
                     accountRepo.save(
                             Account.builder()
-                                    .email("nguyenngoctram762@gmail.com")
+                                    .email("nguyenngoctram7623@gmail.com")
                                     .role(Role.GARMENT_FACTORY)
                                     .registerDate(LocalDate.now())
                                     .status(Status.ACCOUNT_ACTIVE)
