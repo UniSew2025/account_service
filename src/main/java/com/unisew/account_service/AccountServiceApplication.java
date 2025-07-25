@@ -65,6 +65,15 @@ public class AccountServiceApplication {
                                     .status(Status.ACCOUNT_ACTIVE)
                                     .build()
                     );
+
+                    accountRepo.save(
+                            Account.builder()
+                                    .email("abc7621@gmail.com")
+                                    .role(Role.GARMENT_FACTORY)
+                                    .registerDate(LocalDate.now())
+                                    .status(Status.ACCOUNT_ACTIVE)
+                                    .build()
+                    );
                 }
             }
         };
